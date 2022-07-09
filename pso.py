@@ -1,26 +1,21 @@
-# Inspired by Nathan A. Rooy code - from https://github.com/nathanrooy/particle-swarm-optimization/blob/master/pso/pso_simple.py
-
 from random import random
 from random import uniform
 import sys
 from turtle import position
 
 class Particle:
-    def __init__(self, num_dimensions, bound_x1, bound_x2):
+    def __init__(self, num_dimensions, bounds):
         self.err_best=sys.maxsize
         self.err=sys.maxsize
-        self.bounds = (bound_x1, bound_x2)
+        self.bounds = bounds
         self.num_dimensions = num_dimensions
         self.velocity = []
-
-        for i in range(0, self.num_dimensions):
-            self.velocity.append(uniform(-1,1))
-            self.position = [uniform(bound_x1[0], bound_x1[1]), 
-                                uniform(bound_x2[0], bound_x2[1])]
-            self.pos_best = self.position
+        self.velocity = [uniform(-1,1) for i in range(self.num_dimensions)]
+        self.position = [uniform(bounds[j][0], bounds[j][1]) for j in range(self.num_dimensions)]
+        self.pos_best = self.position
 
     def evaluate(self, obj_func):
-        self.err = obj_func(self.position[0], self.position[1])
+        self.err = obj_func(self.position)
 
         # check to see if the current position is an individual best
         if self.err < self.err_best or self.err_best==-1:
@@ -49,7 +44,7 @@ class Particle:
                 
             if self.position[i] >= self.bounds[i][1]:
                 self.position[i] = self.bounds[i][1]-0.0001
-        print(self.position)
+        #print(self.position)
         
         
 class PSO():
@@ -66,10 +61,9 @@ class PSO():
         self.penalty_func = penalty_func
         self.num_particles = num_particles
         self.max_iter = max_iter
-
         self.swarm=[]
         for i in range(0, num_particles):
-            self.swarm.append(Particle(self.num_dimensions, self.bounds[0], self.bounds[1]))
+            self.swarm.append(Particle(self.num_dimensions, self.bounds))
 
     def minimize(self):
         infeasible = False
@@ -84,19 +78,19 @@ class PSO():
                     u = uniform(0,1)
                     p_i_curr = particles[n]
                     p_i_next = particles[n+1]
-                    if self.penalty_func(p_i_curr[0], p_i_curr[1]) == 0 and self.penalty_func(p_i_next[0], p_i_next[1]) == 0 or u < pf:
-                        if self.obj_func(p_i_curr[0], p_i_curr[1]) > self.obj_func(p_i_next[0], p_i_next[1]):
+                    if self.penalty_func(p_i_curr) == 0 and self.penalty_func(p_i_next) == 0 or u < pf:
+                        if self.obj_func(p_i_curr) > self.obj_func(p_i_next):
                             particles[n], particles[n+1] = particles[n+1], particles[n]
-                    if self.penalty_func(p_i_curr[0], p_i_curr[1]) > self.penalty_func(p_i_next[0], p_i_next[1]):
+                    if self.penalty_func(p_i_curr) > self.penalty_func(p_i_next):
                         particles[n], particles[n+1] = particles[n+1], particles[n]
                     
             # check if it's the best value reached until now 
-            if self.penalty_func(particles[0][0], particles[0][1]) == 0: # check if it's feasible
-                if self.obj_func(particles[0][0], particles[0][1]) < self.err_best_g:
+            if self.penalty_func(particles[0]) == 0: # check if it's feasible
+                if self.obj_func(particles[0]) < self.err_best_g:
                     self.pos_best_g=particles[0]
                     self.pos_best_curr = particles[0]
                     infeasible = False
-            elif self.obj_func(particles[0][0], particles[0][1]) < self.err_curr_g:
+            elif self.obj_func(particles[0]) < self.err_curr_g:
                 self.pos_best_curr = particles[0]
                 infeasible = True
 
@@ -110,8 +104,9 @@ class PSO():
             for i in range(0, self.num_particles):
                 self.swarm[i].evaluate(self.obj_func)
 
+            print(self.obj_func(self.pos_best_g))
         # print(self.pos_best_curr)
-        return self.pos_best_g, self.obj_func(self.pos_best_g[0], self.pos_best_g[1])
+        return self.pos_best_g, self.obj_func(self.pos_best_g)
 
         
 
