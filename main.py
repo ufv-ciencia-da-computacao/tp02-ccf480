@@ -18,13 +18,13 @@ def f1(X):
 
 
 if __name__  == "__main__":
-    #pso = PSO(2, penalty_func2, function_2, [(0, 10), (0, 10)], 50, 100)
+    # pso = PSO(2, penalty_func, f1, [(0.000000001, 10), (0, 10)], 50, 100)
 
 
-    df = pd.read_csv(sys.path[0] + "/functions/unidades_geradoras.csv")
+    df = pd.read_csv(sys.path[0] + "/functions/unidades_geradoras_2.csv")
     Pi_min = df["Pi_min"].values
     Pi_max = df["Pi_max"].values
     bounds = [(x, y) for x, y in zip(Pi_min, Pi_max)]
     
-    pso = PSO(40, penalty_func2, function_2, bounds, 50, 10)
+    pso = PSO(13, penalty_func2, function_2, bounds, 30, 100)
     print(pso.minimize())

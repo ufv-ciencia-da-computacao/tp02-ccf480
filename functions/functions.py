@@ -1,3 +1,4 @@
+from curses import pair_content
 import math
 import os
 import pathlib
@@ -14,41 +15,53 @@ def function_1(X):
 
 def g1(X):
     df = pd.read_csv(os.path.join(pathlib.Path(__file__).parent.resolve(), 
-                                "unidades_geradoras.csv"))
+                                "unidades_geradoras_2.csv"))
     cost = 0
-    for i in range(40):
+    for i in range(13):
         constants = df.iloc[i]
         Pi_min, Pi_max = constants["Pi_min"], constants["Pi_max"]
-        if(X[i] < Pi_min): 
-            cost += math.abs(Pi_min - X[i])
-        elif(X[i] > Pi_max):
-            cost += math.abs(X[i] - Pi_max)
-        
+        cost += Pi_min - X[i]
     return cost
 
 def g2(X):
-    PD = 10500     
+    df = pd.read_csv(os.path.join(pathlib.Path(__file__).parent.resolve(), 
+                                "unidades_geradoras_2.csv"))
+    cost = 0
+    for i in range(13):
+        constants = df.iloc[i]
+        Pi_min, Pi_max = constants["Pi_min"], constants["Pi_max"]
+        cost += X[i] - Pi_max
+    return cost
+
+def g3(X):
+    PD = 1800
+    for i in range(len(X)):
+        X[i] = round(X[i], 5)
     return np.sum(X) - PD
 
 def penalty_func2(X):
-    return max(0, g2(X))**2 + max(0, g1(X))**2
+    pen = (g3(X))**2 + max(0, g2(X))**2 + max(0, g1(X))**2
+    return pen
 
 def f(X, constants):
     part_1 = constants["a"] * np.power(X, 2)
     part_2 = constants["b"] * X
     part_3 = constants["e"] * np.sin(constants["f"] * (constants["Pi_min"] - X))
 
-    return part_1 + part_2 + np.absolute(part_3) + constants["c"]
+    res = part_1 + part_2 + np.absolute(part_3) + constants["c"]
+
+    return res
 
 
 def function_2(X):
     df = pd.read_csv(os.path.join(pathlib.Path(__file__).parent.resolve(), 
-                                "unidades_geradoras.csv"))
+                                "unidades_geradoras_2.csv"))
     cost = 0    
-    
-    for i in range(40):
+
+    for i in range(13):
         constants = df.iloc[i]
         cost += f(X[i], constants)
 
+    # print(cost)
     return cost
 
