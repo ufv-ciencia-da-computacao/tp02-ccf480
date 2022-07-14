@@ -19,10 +19,8 @@ class Particle:
 
         # check to see if the current position is an individual best
         if self.err <= self.err_best:
-            if value < self.best_value:
-                self.pos_best = self.position.copy()
-                self.err_best = self.err
-                self.best_value = value
+            self.pos_best = self.position.copy()
+            self.err_best = self.err
                     
     def update_velocity(self, pos_best_g, r1, r2, w):
         c1=2.05
@@ -96,7 +94,7 @@ class PSO():
                 if not swap:
                     break
 
-            print(list(map(self.penalty_func, particles)))
+            # print(list(map(self.penalty_func, particles)))
                     
             # check if it's the best value reached until here
             if self.penalty_func(particles[0]) == 0: # check if it's feasible
@@ -112,7 +110,7 @@ class PSO():
                 infeasible = True
 
             r1 = uniform(0, 1)
-            r2 = uniform(0,1)
+            r2 = uniform(0, 1)
             w=self.w_max-((self.w_max-self.w_min)/self.max_iter)*index
             
             for i in range(0, self.num_particles):
@@ -124,9 +122,12 @@ class PSO():
 
             for i in range(0, self.num_particles):
                 self.swarm[i].evaluate(self.penalty_func, self.obj_func)
-
-            print(index, end=" ")
-            print(self.obj_func(self.pos_best_curr), self.pos_best_curr, self.err_curr)
+            if(self.penalty_func(self.pos_best_curr) == 0):
+                break
+            # print(index, end=" ")
+            # print(self.obj_func(self.pos_best_curr), self.pos_best_curr, self.err_curr)
+        if len(self.pos_best_g) == 0:
+            return self.pos_best_g, -1
         return self.pos_best_g, self.obj_func(self.pos_best_g)
 
         

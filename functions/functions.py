@@ -15,9 +15,9 @@ def function_1(X):
 
 def g1(X):
     df = pd.read_csv(os.path.join(pathlib.Path(__file__).parent.resolve(), 
-                                "unidades_geradoras_2.csv"))
+                                "unidades_geradoras.csv"))
     cost = 0
-    for i in range(13):
+    for i in range(40):
         constants = df.iloc[i]
         Pi_min, Pi_max = constants["Pi_min"], constants["Pi_max"]
         cost += Pi_min - X[i]
@@ -25,18 +25,18 @@ def g1(X):
 
 def g2(X):
     df = pd.read_csv(os.path.join(pathlib.Path(__file__).parent.resolve(), 
-                                "unidades_geradoras_2.csv"))
+                                "unidades_geradoras.csv"))
     cost = 0
-    for i in range(13):
+    for i in range(40):
         constants = df.iloc[i]
         Pi_min, Pi_max = constants["Pi_min"], constants["Pi_max"]
         cost += X[i] - Pi_max
     return cost
 
 def g3(X):
-    PD = 1800
+    PD = 10500
     for i in range(len(X)):
-        X[i] = round(X[i], 5)
+        X[i] = round(X[i], 2)
     return np.sum(X) - PD
 
 def penalty_func2(X):
@@ -55,10 +55,10 @@ def f(X, constants):
 
 def function_2(X):
     df = pd.read_csv(os.path.join(pathlib.Path(__file__).parent.resolve(), 
-                                "unidades_geradoras_2.csv"))
+                                "unidades_geradoras.csv"))
     cost = 0    
 
-    for i in range(13):
+    for i in range(40):
         constants = df.iloc[i]
         cost += f(X[i], constants)
 
